@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Markus - mäng</title>
+  <link rel="stylesheet" href="assets/style/style.css">
+</head>
+<body>
+
+  <canvas id="c"></canvas>
+
+  <div id="ui">
+    <div id="hud">
+      <div id="left-hud">
+        <div class="label">HEALTH</div>
+        <div class="bar"><div id="health-bar"></div></div>
+        <div class="small" id="health-text">200 / 200</div>
+        <div class="label">NEXT CARD</div>
+        <div class="bar"><div id="card-bar"></div></div>
+        <div class="small" id="card-text">0 / 60</div>
+        <div id="time-stop-row" class="ability-row" style="display:none">
+          <div class="label">TIME STOP</div>
+          <div class="bar ability-bar"><div id="time-stop-bar"></div></div>
+          <div class="small" id="time-stop-text">0%</div>
+        </div>
+      </div>
+
+      <div id="center-hud">
+        <div id="wave-text">WAVE 0</div>
+        <div id="enemy-text"></div>
+        <div id="score-text">SCORE: 0 | KILLS: 0</div>
+      </div>
+
+      <div id="weapon-info">
+        <div id="weapon-name">PISTOL</div>
+        <div id="ammo-display">20 / 20</div>
+        <div id="reload-msg">RELOADING</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="banner"></div>
+  <div id="legend"></div>
+  <div id="owned-cards"></div>
+
+  <!-- Start screen: states the goal and the controls -->
+  <div id="start-screen" class="overlay" style="display:flex">
+    <h1>CUBE WARS</h1>
+    <p class="goal">Goal: survive as many waves as you can.<br>
+      Every kill gives points. Enough points let you pick an upgrade card.<br>
+      The game pauses while you choose.<br>
+      Cards turn your pistol into any weapon you like.</p>
+    <p class="controls">Move: W A S D | Aim: mouse | Shoot: hold left click<br>
+      Reload: R | Pick a card: click it or press 1, 2, 3 | Mute: M</p>
+    <button id="start-btn" class="btn">START</button>
+  </div>
+
+  <!-- Card picker: game is frozen while this is visible -->
+  <div id="card-screen" class="overlay">
+    <h1>CHOOSE AN UPGRADE</h1>
+    <p class="goal">The game is paused. Upgrades stack.</p>
+    <div id="card-choices"></div>
+  </div>
+
+  <div id="game-over" class="overlay">
+    <h1>YOU DIED</h1>
+    <p id="final-wave"></p>
+    <p id="final-kills"></p>
+    <p id="final-score"></p>
+    <button id="restart-btn" class="btn">RESTART</button>
+  </div>
+
+  <div id="cheat-panel" class="overlay">
+    <div class="cheat-box">
+      <h1>CHEATS</h1>
+      <div class="cheat-actions">
+        <button id="cheat-skip-wave" class="btn">SKIP WAVE</button>
+        <button id="cheat-card-pull" class="btn">GRANT CARD PULL</button>
+        <div class="cheat-card-row">
+          <select id="cheat-card-select" aria-label="Choose a card"></select>
+          <select id="cheat-rarity-select" aria-label="Choose a rarity"></select>
+          <button id="cheat-grant-card" class="btn">GRANT CARD</button>
+        </div>
+        <button id="cheat-kill-enemies" class="btn">KILL ALL ENEMIES</button>
+        <button id="cheat-heal" class="btn">FULL HEAL</button>
+        <button id="cheat-close" class="btn">CLOSE [\]</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/scripts/config.js"></script>
+  <script src="assets/scripts/audio.js"></script>
+  <script src="assets/scripts/state.js"></script>
+  <script src="assets/scripts/map.js"></script>
+  <script src="assets/scripts/weapon.js"></script>
+  <script src="assets/scripts/enemies.js"></script>
+  <script src="assets/scripts/cards.js"></script>
+  <script src="assets/scripts/cheats.js"></script>
+  <script src="assets/scripts/ui.js"></script>
+  <script src="assets/scripts/render.js"></script>
+  <script src="assets/scripts/main.js"></script>
+</body>
+</html>

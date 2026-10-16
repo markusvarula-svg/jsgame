@@ -1,0 +1,242 @@
+/* Flat styling only: no glow, no gradients, no animation */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #0b0b10;
+  overflow: hidden;
+  font-family: 'Courier New', monospace;
+  color: #dde1ee;
+}
+
+canvas {
+  display: block;
+  cursor: none;
+}
+
+/* HUD */
+#ui {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 16px;
+  pointer-events: none;
+}
+
+#hud {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.label {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #9aa0b8;
+  margin-bottom: 4px;
+}
+
+.bar {
+  width: 200px;
+  height: 12px;
+  background: #15161f;
+  border: 1px solid #4a4f6a;
+}
+
+#health-bar { height: 100%; width: 100%; background: #d94040; }
+#card-bar   { height: 100%; width: 0;    background: #4a7bd0; }
+
+.small {
+  font-size: 12px;
+  letter-spacing: 1px;
+  margin: 4px 0 12px;
+  color: #c4c8d8;
+}
+
+.ability-row { margin-top: 4px; }
+.ability-bar { overflow: hidden; }
+#time-stop-bar { height: 100%; width: 0; background: #7ed6ff; }
+#time-stop-text { margin-top: 4px; color: #9ad9ff; }
+
+/* centred on the screen itself, not squeezed between the left and right HUD blocks */
+#center-hud { position: absolute; left: 50%; top: 0; transform: translateX(-50%); text-align: center; white-space: nowrap; }
+#wave-text  { font-size: 22px; letter-spacing: 6px; padding-left: 6px; }   /* padding cancels the trailing letter gap */
+#enemy-text { font-size: 13px; letter-spacing: 2px; padding-left: 2px; color: #e0a040; margin-top: 4px; }
+#score-text { font-size: 12px; letter-spacing: 2px; padding-left: 2px; color: #9aa0b8; margin-top: 4px; }
+
+#weapon-info { text-align: right; }
+#weapon-name { font-size: 18px; letter-spacing: 4px; color: #e8d070; }
+#ammo-display { font-size: 13px; color: #aab; margin-top: 2px; letter-spacing: 2px; }
+#reload-msg { font-size: 11px; color: #e08a4a; margin-top: 2px; letter-spacing: 2px; display: none; }
+
+/* Messages */
+#banner {
+  position: fixed;
+  top: 110px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid #4a4f6a;
+  padding: 10px 24px;
+  font-size: 15px;
+  letter-spacing: 2px;
+  display: none;
+  pointer-events: none;
+  text-align: center;
+}
+
+#pick-hint {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid #5acb8a;
+  color: #5acb8a;
+  padding: 8px 20px;
+  font-size: 13px;
+  letter-spacing: 2px;
+  display: none;
+  pointer-events: none;
+}
+
+#legend, #owned-cards {
+  position: fixed;
+  bottom: 16px;
+  font-size: 11px;
+  letter-spacing: 1px;
+  line-height: 1.8;
+  pointer-events: none;
+}
+#legend      { right: 16px; text-align: right; }
+#owned-cards { left: 16px; color: #9aa0b8; }
+
+/* Overlays */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px;
+}
+
+.overlay h1 { font-size: 48px; letter-spacing: 10px; margin-bottom: 20px; }
+.overlay p  { color: #aab; letter-spacing: 2px; font-size: 14px; line-height: 1.9; margin-top: 8px; }
+#game-over h1 { color: #d94040; }
+
+.btn {
+  margin-top: 30px;
+  padding: 14px 40px;
+  background: transparent;
+  border: 1px solid #dde1ee;
+  color: #dde1ee;
+  font-family: inherit;
+  font-size: 14px;
+  letter-spacing: 4px;
+  cursor: pointer;
+}
+.btn:hover { background: #dde1ee; color: #0b0b10; }
+
+/* Cards */
+/* card picker sits a little above the middle of the screen */
+#card-screen { justify-content: center; padding-bottom: 14vh; overflow-y: auto; }
+#card-choices {
+  display: flex;
+  gap: 40px;
+  margin-top: 28px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Card: back side (hand-drawn design) shows first, hovering flips it to the front */
+.card {
+  width: 250px;
+  height: 340px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #dde1ee;
+  font-family: inherit;
+  cursor: pointer;
+  perspective: 900px;
+}
+.card-flip {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.5s;
+}
+.card.flipped .card-flip { transform: rotateY(180deg); }   /* class is added on first hover, so it stays flipped */
+.card-face {
+  display: block;
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--rc);
+  border-radius: 0;
+  background: #141622;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  /* higher rarity = bigger and brighter glow */
+  box-shadow: 0 0 calc(var(--glow) * 1px) calc(var(--glow) * 0.12px) rgba(var(--rgb), var(--ga)),
+              inset 0 0 calc(var(--glow) * 0.6px) rgba(var(--rgb), calc(var(--ga) * 0.35));
+}
+.card-back { display: flex; align-items: center; justify-content: center; padding: 0; }
+.card-back svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: var(--rc);
+  stroke-width: 3;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+  filter: drop-shadow(0 0 calc(var(--glow) * 0.25px) rgba(var(--rgb), var(--ga)));
+}
+.card-front {
+  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  text-align: left;
+  background: #171926;
+}
+
+.card-key   { font-size: 12px; color: #9aa0b8; }
+.card-name  { font-size: 16px; letter-spacing: 2px; color: #e8d070; }
+.card-rarity { display: inline-block; align-self: flex-start; margin-top: -4px; padding: 4px 8px; font-size: 10px; letter-spacing: 2px; border: 1px solid #4a4f6a; }
+.card-rarity-common { color: #9fb0d0; border-color: #9fb0d0; }
+.card-rarity-uncommon { color: #4fd08a; border-color: #4fd08a; }
+.card-rarity-rare { color: #4a9dff; border-color: #4a9dff; }
+.card-rarity-epic { color: #b05cff; border-color: #b05cff; }
+.card-rarity-legendary { color: #ffd24a; border-color: #ffd24a; }
+.card-bonus { font-size: 11px; letter-spacing: 2px; color: #9aa0b8; margin-top: -6px; }
+.card-desc  { font-size: 13px; line-height: 1.6; color: #c4c8d8; flex: 1; }
+.card-owned { font-size: 11px; letter-spacing: 2px; color: #5acb8a; }
+
+/* Cheat panel */
+#cheat-panel { z-index: 5; background: rgba(0, 0, 0, 0.9); }
+.cheat-box {
+  width: min(420px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 24px;
+  border: 1px solid #4a4f6a;
+  background: #101117;
+}
+.cheat-box h1 { font-size: 30px; letter-spacing: 6px; margin-bottom: 20px; }
+.cheat-actions { display: flex; flex-direction: column; gap: 10px; }
+.cheat-actions .btn { width: 100%; margin: 0; padding: 12px; font-size: 12px; }
+.cheat-card-row { display: flex; gap: 8px; }
+.cheat-card-row select { min-width: 0; flex: 1; padding: 10px; background: #171926; border: 1px solid #4a4f6a; color: #dde1ee; font: inherit; }
+.cheat-card-row .btn { width: auto; }
