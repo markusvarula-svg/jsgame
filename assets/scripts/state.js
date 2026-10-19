@@ -4,7 +4,7 @@
 
 let canvas, ctx, last = 0;
 
-// menu | play | cards | over.  Only "play" runs the game logic, so the other
+// menu | play | cards | over | shop. Only "play" runs the game logic, so the other
 // states freeze the game (that is how the card screen pauses everything).
 let state = 'menu';
 
@@ -16,10 +16,12 @@ let camX = 0, camY = 0;
 
 // Progress
 let kills = 0, score = 0;
-let cardProgress = 0, cardCost = CARD_COST_START, cardsTaken = 0, offered = [];
+let cardProgress = 0, cardCost = CARD_COST_START, cardsTaken = 0, paidCardsTaken = 0, offered = [];
+let freeCardPullsRemaining = 0;
 let wave = 0, waveMode = 'intermission', toSpawn = 0, spawnTimer = 0, intermission = 0;
 let bannerTimer = 0;
 let timeStopCharge = 0, timeStopPhase = 'ready', timeStopTimer = 0, timeStopWindup = 0;
+let cheatsUsed = false;      // set by any cheat: that run earns no scrap and is not recorded
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 const diagonalMoveFactor = 1 / Math.sqrt(2);

@@ -16,7 +16,8 @@ function cardPower(id) { return (player.cardPower && player.cardPower[id]) || 0;
 
 // Damage card: +20% of base per copy.   25 -> 30 -> 35 -> 40 ...
 function bulletDamage() {
-  return BASE_WEAPON.damage * (1 + PER_CARD.damage * cardPower('damage'));
+  return BASE_WEAPON.damage * (1 + META_BONUS.damage * shopLevel('damage')) *
+    (1 + PER_CARD.damage * cardPower('damage'));
 }
 
 // Bullet Speed card: +25% of base per copy.
@@ -252,6 +253,14 @@ function lifeSiphonHeal() {
   return PER_CARD.siphon * cardPower('siphon');
 }
 
+function damagePlayer(amount) {
+  const reduction = Math.min(0.8,
+    META_BONUS.damageReduction * shopLevel('armor') +
+    PER_CARD.damageReduction * cardPower('damage-reduction'));
+  player.hp -= amount * (1 - reduction);
+  if (player.hp <= 0) endGame();
+}
+
 // Blast damage = bullet damage at the centre, shrinking linearly to the edge value.
 // The explosion never hurts the player.
 function radialDamageFalloff(distance, radius, maxDamage, minimumShare) {
@@ -288,11 +297,10 @@ function stepEnemyBullet(b, dt) {
   }
   if (Math.hypot(b.x - player.x, b.y - player.y) < PLAYER_SIZE + BULLET_RADIUS) {
     if (b.blastRadius > 0) explodeEnemyBullet(b);
-    else player.hp -= b.damage;
+    else damagePlayer(b.damage);
     sfx('hurt');
     spawnBurst(player.x, player.y, '#c02020', 3, 160, 0.3);
     b.dead = true;
-    if (player.hp <= 0) endGame();
   }
 }
 
@@ -301,8 +309,7 @@ function explodeEnemyBullet(b) {
   const distance = Math.hypot(player.x - b.x, player.y - b.y);
   if (distance < b.blastRadius) {
     const damageTaken = radialDamageFalloff(distance, b.blastRadius, b.damage, 0.5);
-    player.hp -= damageTaken;
-    if (player.hp <= 0) endGame();
+    damagePlayer(damageTaken);
   }
   spawnBurst(b.x, b.y, '#e07830', 10, 300, 0.5);
   particles.push({

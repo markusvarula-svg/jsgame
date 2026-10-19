@@ -10,7 +10,7 @@ function init() {
 
   window.addEventListener('keydown', e => {
     const k = e.key.toLowerCase();
-    if (isCheatShortcut(e) && !e.repeat) {
+    if (typeof isCheatShortcut === 'function' && isCheatShortcut(e) && !e.repeat) {   // only exists in index.dev.html
       e.preventDefault();
       toggleCheatPanel();
       return;
@@ -18,6 +18,10 @@ function init() {
     if (k === ' ' && !e.repeat) {
       e.preventDefault();
       activateTimeStop();
+      return;
+    }
+    if (state === 'shop' && k === 'escape') {
+      closeShop();
       return;
     }
     keys[k] = true;
@@ -37,7 +41,12 @@ function init() {
 
   el('start-btn').addEventListener('click', startGame);
   el('restart-btn').addEventListener('click', restartGame);
-  initCheats();
+  el('menu-btn').addEventListener('click', showMenu);
+  el('shop-open-start').addEventListener('click', openShop);
+  el('shop-open-over').addEventListener('click', openShop);
+  initShop();
+  initRunRecords();
+  if (typeof initCheats === 'function') initCheats();   // cheats.js is not loaded on the public site
 
   setupGame();
   requestAnimationFrame(loop);
@@ -54,12 +63,25 @@ function resize() {
 
 function startGame() {
   el('start-screen').style.display = 'none';
+  beginRun();
+}
+
+function beginRun() {
+  setupGame();
   state = 'play';
+  freeCardPullsRemaining = shopLevel('startingPulls');
+  if (freeCardPullsRemaining > 0) openCards();
 }
 
 function restartGame() {
-  setupGame();
-  state = 'play';
+  beginRun();
+}
+
+function showMenu() {
+  el('game-over').style.display = 'none';
+  el('start-screen').style.display = 'flex';
+  state = 'menu';
+  loadRunRecords();
 }
 
 
@@ -67,20 +89,23 @@ function restartGame() {
 
 function setupGame() {
   kills = 0; score = 0;
-  cardProgress = 0; cardCost = CARD_COST_START; cardsTaken = 0;
+  cardProgress = 0; cardCost = CARD_COST_START; cardsTaken = 0; paidCardsTaken = 0;
+  freeCardPullsRemaining = 0;
   wave = 0; waveMode = 'intermission'; toSpawn = 0; intermission = 1.5;
   mouseDown = false; keys = {};
   bullets = []; eBullets = []; enemies = []; particles = [];
   timeStopCharge = 0; timeStopPhase = 'ready'; timeStopTimer = 0; timeStopWindup = 0;
+  cheatsUsed = false;
 
   el('game-over').style.display   = 'none';
   el('card-screen').style.display = 'none';
 
   buildWorld();
 
+  const maxHp = PLAYER_MAX_HP + META_BONUS.health * shopLevel('health');
   player = {
     x: 2.5 * TILE, y: 2.5 * TILE, vx: 0, vy: 0, angle: 0,
-    hp: PLAYER_MAX_HP, maxHp: PLAYER_MAX_HP, size: PLAYER_SIZE,
+    hp: maxHp, maxHp, size: PLAYER_SIZE,
     cards: {},                                    // card id -> number of copies owned
     cardPower: {},                                // card id -> summed rarity bonus of those copies
     gun: {                                        // the one pistol
@@ -247,10 +272,21 @@ function endGame() {
   state = 'over';
   mouseDown = false;
   player.hp = 0;
+  // A run that used any cheat earns no scrap and is not saved to the leaderboard
+  const salvageEarned = cheatsUsed ? 0 : Math.max(10, Math.floor(score / 5) + wave * 5);
+  if (!cheatsUsed) {
+    metaProgress.credits += salvageEarned;
+    saveMetaProgress();
+    updateShop();
+    saveRunRecord({ score, wave, kills, cardsTaken, endedAt: Date.now() });
+  }
   sfx('gameover');
   el('final-wave').textContent  = 'WAVE REACHED: ' + wave;
   el('final-kills').textContent = 'KILLS: ' + kills;
   el('final-score').textContent = 'SCORE: ' + score + ' | UPGRADES: ' + cardsTaken;
+  el('final-salvage').textContent = cheatsUsed
+    ? 'CHEATS USED: NO SCRAP, RUN NOT RECORDED'
+    : 'SCRAP EARNED: +' + salvageEarned + ' | BANK: ' + metaProgress.credits;
   el('game-over').style.display = 'flex';
 }
 

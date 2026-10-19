@@ -48,6 +48,7 @@ function closeCheatPanel() {
 }
 
 function cheatSkipWave() {
+  cheatsUsed = true;
   eBullets = [];
   if (waveMode === 'active') {
     enemies = [];
@@ -61,6 +62,7 @@ function cheatSkipWave() {
 }
 
 function cheatGrantCardPull() {
+  cheatsUsed = true;
   cardProgress += cardCost;
   updateHUD();
   showBanner('CARD PULL GRANTED', 1.5);
@@ -70,10 +72,12 @@ function cheatGrantSelectedCard() {
   const cardId = el('cheat-card-select').value;
   const rarity = cardId === 'time-stop' ? 'legendary' : el('cheat-rarity-select').value;
   if (!grantCard(cardId, rarity)) return;
+  cheatsUsed = true;
   showBanner('CARD GRANTED: ' + CARDS.find(card => card.id === cardId).name, 1.5);
 }
 
 function cheatKillEnemies() {
+  cheatsUsed = true;
   for (const enemy of enemies) enemy.hp = 0;
   toSpawn = 0;
   eBullets = [];
@@ -81,6 +85,7 @@ function cheatKillEnemies() {
 }
 
 function cheatHeal() {
+  cheatsUsed = true;
   player.hp = player.maxHp;
   if (cheatReturnState === 'over') {
     cheatReturnState = 'play';

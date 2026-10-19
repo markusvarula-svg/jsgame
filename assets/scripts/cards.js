@@ -25,6 +25,8 @@ const CARDS = [
     onPick: b => { player.gun.ammo += Math.round(PER_CARD.magazine * b); } },
   { id: 'damage', name: 'DAMAGE',
     desc: 'Bullets deal ' + PER_CARD.damage * 100 + '% more damage.' },
+  { id: 'damage-reduction', name: 'DAMAGE REDUCTION',
+    desc: 'Incoming damage is reduced by ' + PER_CARD.damageReduction * 100 + '%.' },
   { id: 'rate', name: 'FIRE RATE',
     desc: 'You shoot ' + PER_CARD.rate * 100 + '% faster.' },
   { id: 'health', name: 'TOUGH HIDE',
@@ -168,11 +170,20 @@ function pickCard(i) {
 
   grantCard(card.id, pick.rarity);
   sfx('cardPick');
-  cardProgress -= cardCost;
   cardsTaken++;
-  cardCost = nextCardCost(cardsTaken);
+  if (freeCardPullsRemaining > 0) {
+    freeCardPullsRemaining--;
+  } else {
+    cardProgress -= cardCost;
+    paidCardsTaken++;
+    cardCost = nextCardCost(paidCardsTaken);
+  }
 
   el('card-screen').style.display = 'none';
+  if (freeCardPullsRemaining > 0) {
+    openCards();
+    return;
+  }
   state = 'play';                  // unfreeze
   showBanner('UPGRADE TAKEN: ' + CARD_RARITY[pick.rarity].label + ' ' + card.name, 1.5);
   updateHUD();

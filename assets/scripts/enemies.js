@@ -5,7 +5,10 @@
 // ── WAVES ─────────────────────────────────────────────────────────────────
 
 function enemiesInWave(n)  { return WAVE.baseEnemies + WAVE.perWave * n; }
-function maxAlive()        { return Math.min(WAVE.maxAliveBase + wave, WAVE.maxAliveCap); }
+function maxAlive() {
+  const milestoneBonus = WAVE.maxAlivePerTenWaves * Math.floor(wave / 10);
+  return Math.min(WAVE.maxAliveBase + wave, WAVE.maxAliveCap) + milestoneBonus;
+}
 
 function startWave() {
   wave++;
@@ -37,7 +40,11 @@ function updateWave(dt) {
       spawnTimer -= dt;
       if (spawnTimer <= 0 && enemies.length < maxAlive()) {
         if (spawnEnemy(pickEnemyType())) toSpawn--;
-        spawnTimer = 0.8;
+        const milestones = Math.floor(wave / 10);
+        spawnTimer = Math.max(
+          WAVE.minSpawnInterval,
+          WAVE.spawnInterval - WAVE.spawnIntervalReduction * milestones
+        );
       }
     } else if (enemies.length === 0) {
       waveCleared();
@@ -207,8 +214,7 @@ function updateEnemies(dt) {
     // Touching an enemy hurts
     if (dist < PLAYER_SIZE + e.size) {
       sfx('hurt');
-      player.hp -= e.damage * CONTACT_DPS_FACTOR * dt;
-      if (player.hp <= 0) endGame();
+      damagePlayer(e.damage * CONTACT_DPS_FACTOR * dt);
     }
   }
 

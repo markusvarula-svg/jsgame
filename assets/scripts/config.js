@@ -19,6 +19,12 @@ const PLAYER_SIZE   = 18;
 const PLAYER_SPEED  = 160;       // pixels per second
 const PLAYER_MAX_HP = 200;
 
+const META_BONUS = {
+  damage: 0.10,
+  health: 25,
+  damageReduction: 0.05,
+};
+
 // ── GUN ───────────────────────────────────────────────────────────
 const BASE_WEAPON = {
   damage:      25,               // damage of one bullet
@@ -30,6 +36,7 @@ const BASE_WEAPON = {
 
 const PER_CARD = {
   damage:    0.20,               // +20% of base damage
+  damageReduction: 0.15,         // -15% incoming damage
   speed:     0.25,               // +25% of base bullet speed
   rate:      0.15,               // -15% of base fire delay
   reload:    0.15,               // -15% of base reload time
@@ -91,7 +98,7 @@ const ENEMY_TYPES = {
   yellow: {
     from: 2, weight: 3, hp: 40, speed: 140, wanderSpeed: 95, size: 13, points: 10, sides: 3,
     damage: 10, fireDelay: 1.2, bulletSpeed: 380, bullets: 1, gap: 0, burst: 1, prefDist: 110,
-    color: '#e6cc30', dark: '#8c7c1c', line: '#fff0a0', info: 'YELLOW - scout, fast and weak',
+    color: '#e6cc30', dark: '#8c7c1c', line: '#fff0a0', info: 'YELLOW - fast and weak',
   },
   purple: {
     from: 4, weight: 2, hp: 240, speed: 42, wanderSpeed: 38, size: 20, points: 30, sides: 0,
@@ -115,13 +122,13 @@ const ENEMY_TYPES = {
     color: '#b84a36', dark: '#702b24', line: '#ffad8c', info: 'SIEGE - fires growing explosive blasts',
   },
   turret: {
-    from: 12, weight: 1, hp: 500, speed: 0, wanderSpeed: 0, size: 22, points: 65, sides: 5,
-    damage: 14, fireDelay: 1.5, bulletSpeed: 320, bullets: 5, gap: 0, burst: 1,
-    prefDist: 0, spinSpeed: 1.2, turret: true,
+    from: 12, weight: 1, hp: 750, speed: 0, wanderSpeed: 0, size: 22, points: 65, sides: 5,
+    damage: 14, fireDelay: 0.5, bulletSpeed: 100, bullets: 5, gap: 0, burst: 1,
+    prefDist: 0, spinSpeed: 2, turret: true,
     color: '#c0fff3', dark: '#1d695d', line: '#9affe8', info: 'TURRET - stationary, spins and fires in five directions',
   },
   scanner: {
-    from: 8, weight: 2, hp: 85, speed: 78, wanderSpeed: 78, size: 16, points: 25, sides: 0,
+    from: 8, weight: 2, hp: 55, speed: 78, wanderSpeed: 78, size: 16, points: 25, sides: 0,
     damage: 0, fireDelay: 0, bulletSpeed: 0, bullets: 0, gap: 0, burst: 0,
     prefDist: 0, scanner: true, pingRange: 420, pingDuration: 1.2, pingInterval: 5,
     color: '#00862b', dark: '#163f23', line: '#a3ffb2', info: 'SCANNER - flies and alerts nearby enemies with green pings',
@@ -133,7 +140,11 @@ const WAVE = {
   baseEnemies:   4,              // enemies in a wave = 4 + 3 * wave number
   perWave:       3,
   maxAliveBase:  4,              // enemies alive at once = 4 + wave number, capped
-  maxAliveCap:   18,
+  maxAliveCap:   18,             // base cap, increased by 2 every 10 waves
+  maxAlivePerTenWaves: 2,
+  spawnInterval: 0.8,            // seconds between spawns
+  spawnIntervalReduction: 0.1,   // seconds faster every 10 waves
+  minSpawnInterval: 0.2,
   breakTime:     5,              // seconds between waves
   healShare:     0.3,            // health restored after a wave
   hpGrowth:      0.17,           // +17% enemy health per wave

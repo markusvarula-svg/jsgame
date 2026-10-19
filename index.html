@@ -53,7 +53,18 @@
       Cards turn your pistol into any weapon you like.</p>
     <p class="controls">Move: W A S D | Aim: mouse | Shoot: hold left click<br>
       Reload: R | Pick a card: click it or press 1, 2, 3 | Mute: M</p>
-    <button id="start-btn" class="btn">START</button>
+    <p id="meta-balance" class="meta-balance">SCRAP: 0</p>
+    <div class="menu-actions">
+      <button id="start-btn" class="btn">START RUN</button>
+      <button id="shop-open-start" class="btn">ARMORY</button>
+    </div>
+    <aside id="run-records" class="run-records" aria-label="Best run records">
+      <header class="run-records-header">
+        <h2>BEST RUNS</h2>
+        <span>TOP 5</span>
+      </header>
+      <div id="run-record-list" aria-live="polite">LOADING RECORDS</div>
+    </aside>
   </div>
 
   <!-- Card picker: game is frozen while this is visible -->
@@ -68,25 +79,32 @@
     <p id="final-wave"></p>
     <p id="final-kills"></p>
     <p id="final-score"></p>
-    <button id="restart-btn" class="btn">RESTART</button>
+    <p id="final-salvage"></p>
+    <div class="menu-actions">
+      <button id="restart-btn" class="btn">NEXT RUN</button>
+      <button id="menu-btn" class="btn">MENU</button>
+      <button id="shop-open-over" class="btn">ARMORY</button>
+    </div>
   </div>
 
-  <div id="cheat-panel" class="overlay">
-    <div class="cheat-box">
-      <h1>CHEATS</h1>
-      <div class="cheat-actions">
-        <button id="cheat-skip-wave" class="btn">SKIP WAVE</button>
-        <button id="cheat-card-pull" class="btn">GRANT CARD PULL</button>
-        <div class="cheat-card-row">
-          <select id="cheat-card-select" aria-label="Choose a card"></select>
-          <select id="cheat-rarity-select" aria-label="Choose a rarity"></select>
-          <button id="cheat-grant-card" class="btn">GRANT CARD</button>
+  <div id="shop-screen" class="overlay">
+    <section class="shop-shell" aria-labelledby="shop-title">
+      <header class="shop-header">
+        <div>
+          <p class="shop-kicker">PERMANENT UPGRADES</p>
+          <h1 id="shop-title">ARMORY</h1>
         </div>
-        <button id="cheat-kill-enemies" class="btn">KILL ALL ENEMIES</button>
-        <button id="cheat-heal" class="btn">FULL HEAL</button>
-        <button id="cheat-close" class="btn">CLOSE [\]</button>
-      </div>
-    </div>
+        <div class="shop-balance">
+          <span>AVAILABLE SCRAP</span>
+          <strong id="shop-credits">0</strong>
+        </div>
+      </header>
+      <div id="shop-items" class="shop-items"></div>
+      <footer class="shop-footer">
+        <span id="shop-message" aria-live="polite"></span>
+        <button id="shop-close" class="btn">BACK</button>
+      </footer>
+    </section>
   </div>
 
   <script src="assets/scripts/config.js"></script>
@@ -96,7 +114,8 @@
   <script src="assets/scripts/weapon.js"></script>
   <script src="assets/scripts/enemies.js"></script>
   <script src="assets/scripts/cards.js"></script>
-  <script src="assets/scripts/cheats.js"></script>
+  <script src="assets/scripts/shop.js"></script>
+  <script src="assets/scripts/run-records.js"></script>
   <script src="assets/scripts/ui.js"></script>
   <script src="assets/scripts/render.js"></script>
   <script src="assets/scripts/main.js"></script>
