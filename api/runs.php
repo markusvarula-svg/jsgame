@@ -13,7 +13,7 @@ function respond($status, $body) {
 }
 
 // Credentials live outside public_html. If your game sits in a sub-folder, change the 2.
-$config = require dirname(__DIR__, 2) . '/cube-wars-config.php';
+$config = require dirname(__DIR__, 3) . '/cube-wars-config.php';
 
 try {
   $pdo = new PDO(
