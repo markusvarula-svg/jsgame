@@ -23,7 +23,7 @@ try {
     [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_EMULATE_PREPARES => false]
   );
 } catch (PDOException $e) {
-  respond(500, ['error' => 'database unavailable']);
+  respond(500, ['error' => 'database unavailable', 'detail' => $e->getMessage()]);
 }
 
 $method = $_SERVER['REQUEST_METHOD'];
