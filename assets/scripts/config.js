@@ -119,8 +119,8 @@ const ENEMY_TYPES = {
 };
 
 const WAVE = {
-  baseEnemies:   4,
-  perWave:       3,
+  baseEnemies:   2,
+  perWave:       2,
   maxAliveBase:  4,
   maxAliveCap:   18,
   maxAlivePerTenWaves: 2,
@@ -129,10 +129,10 @@ const WAVE = {
   minSpawnInterval: 0.2,
   breakTime:     5,
   healShare:     0.3,
-  hpGrowth:      0.17,
+  hpGrowth:      0.15,
   speedGrowth:   0.035,
   speedCap:      1.5,
-  damageGrowth:  0.065,
+  damageGrowth:  0.055,
   rateGrowth:    0.03,
   rateCap:       3.0,
 };
