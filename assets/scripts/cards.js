@@ -1,8 +1,5 @@
 // ════════════════════════════════════════════════════════════════════════════
 //  cards.js - points, upgrade cards and the card picker
-//
-//  The weapon formulas that USE these cards are in weapon.js. A card only needs
-//  to be counted (player.cards[id]); onPick is for one-time effects.
 // ════════════════════════════════════════════════════════════════════════════
 
 const CARDS = [
@@ -18,11 +15,6 @@ const CARDS = [
     desc: 'Bullets bounce off walls 1 more time.' },
   { id: 'pierce', name: 'PIERCE',
     desc: 'Bullets pass through 1 more enemy.' },
-  { id: 'reload', name: 'RELOAD SPEED',
-    desc: 'Reloading takes ' + PER_CARD.reload * 100 + '% less time.' },
-  { id: 'ammo', name: 'AMMO CAPACITY',
-    desc: 'The magazine holds ' + PER_CARD.magazine + ' more bullets.',
-    onPick: b => { player.gun.ammo += Math.round(PER_CARD.magazine * b); } },
   { id: 'damage', name: 'DAMAGE',
     desc: 'Bullets deal ' + PER_CARD.damage * 100 + '% more damage.' },
   { id: 'damage-reduction', name: 'DAMAGE REDUCTION',
@@ -47,13 +39,9 @@ const CARDS = [
     onPick: () => { timeStopCharge = 0; } },
 ];
 
-// Card back (the card's own border is the outer frame). Built from the card's inside size so nothing is stretched.
-// Card is 250 x 340 with a 2px border, so the inside is 246 x 336 (keep in sync with .card in style.css).
-// Even 26px margins: a square in each corner, lines joining the squares' inner corners into a rectangle,
-// and a perfect cube (a square turned 45 degrees) centred in it. Drawn in the rarity colour (--rc / --rgb).
 function buildCardBack(w, h) {
-  const m = 26, s = 28, r = w - m - s, d = h - m - s;       // margin, square size, right x, bottom y
-  const cx = w / 2, cy = h / 2, q = 38;                      // q = distance from the centre to each cube tip
+  const m = 26, s = 28, r = w - m - s, d = h - m - s;
+  const cx = w / 2, cy = h / 2, q = 38;
   return '<svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none">' +
     '<rect x="' + m + '" y="' + m + '" width="' + s + '" height="' + s + '"/>' +
     '<rect x="' + r + '" y="' + m + '" width="' + s + '" height="' + s + '"/>' +
@@ -66,10 +54,8 @@ function buildCardBack(w, h) {
 }
 const CARD_BACK_SVG = buildCardBack(246, 336);
 
-// Cards that give whole numbers (extra bullets, bounces...) gain the rounded bonus: 1, 1, 2, 2
 const INTEGER_CARDS = ['burst', 'spread', 'bounce', 'pierce'];
 
-// Roll one rarity from the weights. Legendary only when allowed (Time Stop not owned yet).
 function rollRarity(allowLegendary) {
   const keys = Object.keys(CARD_RARITY).filter(r => allowLegendary || r !== 'legendary');
   let roll = Math.random() * keys.reduce((sum, r) => sum + CARD_RARITY[r].weight, 0);
@@ -88,8 +74,6 @@ function bonusText(card, rarity) {
 }
 
 
-// ── POINTS ────────────────────────────────────────────────────────────────
-
 function addPoints(n) {
   score += n;
   cardProgress += n;
@@ -100,14 +84,11 @@ function nextCardCost(cardsAlreadyTaken) {
 }
 
 
-// ── CARD PICKER ───────────────────────────────────────────────────────────
-
 function openCards() {
   sfx('cardOpen');
-  state = 'cards';                 // this stops update(), so the game is frozen
+  state = 'cards';
   mouseDown = false;
 
-  // Each of the 3 slots rolls a rarity. A legendary roll is Time Stop; every other card can be any rarity.
   offered = [];
   const normal = CARDS.filter(card => card.id !== 'time-stop');
   while (offered.length < 3) {
@@ -143,7 +124,7 @@ function openCards() {
           '<span class="card-owned">' + (owned > 0 ? 'OWNED: ' + owned : 'NEW') + '</span>' +
         '</span>' +
       '</span>';
-    button.addEventListener('mouseenter', () => {                // hovering flips the card, and it stays flipped
+    button.addEventListener('mouseenter', () => {
       if (matchMedia('(hover: none)').matches || button.classList.contains('flipped')) return;
       button.classList.add('flipped');
       sfx('flip');
@@ -154,8 +135,6 @@ function openCards() {
   el('card-screen').style.display = 'flex';
 }
 
-// You must see a card before taking it. Mouse: hovering flips it for good, then click picks.
-// Touch screens and the 1-2-3 keys: the first press flips the card, the second press picks it.
 function revealOrPick(i) {
   const button = el('card-choices').children[i];
   if (!button) return;
@@ -184,7 +163,7 @@ function pickCard(i) {
     openCards();
     return;
   }
-  state = 'play';                  // unfreeze
+  state = 'play';
   showBanner('UPGRADE TAKEN: ' + CARD_RARITY[pick.rarity].label + ' ' + card.name, 1.5);
   updateHUD();
 }

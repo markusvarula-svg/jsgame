@@ -17,7 +17,6 @@ canvas {
   cursor: none;
 }
 
-/* HUD */
 #ui {
   position: fixed;
   top: 0;
@@ -63,18 +62,14 @@ canvas {
 #time-stop-bar { height: 100%; width: 0; background: #7ed6ff; }
 #time-stop-text { margin-top: 4px; color: #9ad9ff; }
 
-/* centred on the screen itself, not squeezed between the left and right HUD blocks */
 #center-hud { position: absolute; left: 50%; top: 0; transform: translateX(-50%); text-align: center; white-space: nowrap; }
-#wave-text  { font-size: 22px; letter-spacing: 6px; padding-left: 6px; }   /* padding cancels the trailing letter gap */
+#wave-text  { font-size: 22px; letter-spacing: 6px; padding-left: 6px; }
 #enemy-text { font-size: 13px; letter-spacing: 2px; padding-left: 2px; color: #e0a040; margin-top: 4px; }
 #score-text { font-size: 12px; letter-spacing: 2px; padding-left: 2px; color: #9aa0b8; margin-top: 4px; }
 
 #weapon-info { text-align: right; }
 #weapon-name { font-size: 18px; letter-spacing: 4px; color: #e8d070; }
-#ammo-display { font-size: 13px; color: #aab; margin-top: 2px; letter-spacing: 2px; }
-#reload-msg { font-size: 11px; color: #e08a4a; margin-top: 2px; letter-spacing: 2px; display: none; }
 
-/* Messages */
 #banner {
   position: fixed;
   top: 110px;
@@ -116,7 +111,6 @@ canvas {
 #legend      { right: 16px; text-align: right; }
 #owned-cards { left: 16px; color: #9aa0b8; }
 
-/* Overlays */
 .overlay {
   position: fixed;
   inset: 0;
@@ -176,7 +170,6 @@ canvas {
 .run-record-wave { color: #c4c8d8; }
 .run-record-score { color: #5acb8a; text-align: right; }
 
-/* Permanent upgrade shop */
 #shop-screen { overflow-y: auto; }
 .shop-shell { width: min(860px, 100%); margin: auto; text-align: left; }
 .shop-header { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding-bottom: 18px; border-bottom: 1px solid #4a4f6a; }
@@ -212,8 +205,6 @@ canvas {
   .run-records { position: static; align-self: flex-end; margin: 16px 0 0 auto; flex-shrink: 0; }
 }
 
-/* Cards */
-/* card picker sits a little above the middle of the screen */
 #card-screen { justify-content: center; padding-bottom: 14vh; overflow-y: auto; }
 #card-choices {
   display: flex;
@@ -223,7 +214,6 @@ canvas {
   justify-content: center;
 }
 
-/* Card: back side (hand-drawn design) shows first, hovering flips it to the front */
 .card {
   width: 250px;
   height: 340px;
@@ -243,7 +233,7 @@ canvas {
   transform-style: preserve-3d;
   transition: transform 0.5s;
 }
-.card.flipped .card-flip { transform: rotateY(180deg); }   /* class is added on first hover, so it stays flipped */
+.card.flipped .card-flip { transform: rotateY(180deg); }
 .card-face {
   display: block;
   position: absolute;
@@ -253,7 +243,6 @@ canvas {
   background: #141622;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  /* higher rarity = bigger and brighter glow */
   box-shadow: 0 0 calc(var(--glow) * 1px) calc(var(--glow) * 0.12px) rgba(var(--rgb), var(--ga)),
               inset 0 0 calc(var(--glow) * 0.6px) rgba(var(--rgb), calc(var(--ga) * 0.35));
 }
@@ -290,7 +279,6 @@ canvas {
 .card-desc  { font-size: 13px; line-height: 1.6; color: #c4c8d8; flex: 1; }
 .card-owned { font-size: 11px; letter-spacing: 2px; color: #5acb8a; }
 
-/* Cheat panel */
 #cheat-panel { z-index: 5; background: rgba(0, 0, 0, 0.9); }
 .cheat-box {
   width: min(420px, 100%);

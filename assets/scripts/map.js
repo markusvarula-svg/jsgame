@@ -3,16 +3,12 @@
 //
 //  Grid values: 0 floor | 1 solid block
 // ════════════════════════════════════════════════════════════════════════════
-
-// ── GENERATION ────────────────────────────────────────────────────────────
-
 function emptyArena() {
   return Array.from({ length: ROWS }, (_, y) =>
     Array.from({ length: COLS }, (_, x) =>
       (x === 0 || y === 0 || x === COLS - 1 || y === ROWS - 1) ? 1 : 0));
 }
 
-// Shallow room division keeps the layout open while retaining broad connections.
 function generateMap() {
   const largestEnemyRadius = Math.max(...Object.values(ENEMY_TYPES)
     .filter(type => !type.turret).map(type => type.size));
@@ -22,7 +18,6 @@ function generateMap() {
 
     addBlockPillars(g, largestEnemyRadius);
 
-    // Keep the player's start corner clear
     for (let y = 1; y <= 3; y++) for (let x = 1; x <= 3; x++) g[y][x] = 0;
 
     if (isConnected(g) && isConnectedWithClearance(g, largestEnemyRadius)) return g;
@@ -51,7 +46,6 @@ function fallbackMap() {
   return g;
 }
 
-// Add chunky square pillars only when every floor tile remains reachable.
 function addBlockPillars(g, largestEnemyRadius) {
   for (let i = 0; i < 22; i++) {
     const size = 1 + rand(3);
@@ -70,19 +64,18 @@ function addBlockPillars(g, largestEnemyRadius) {
   }
 }
 
-// Split a free area at most twice, leaving a 3-tile passage in each wall.
 function divide(g, x0, y0, w, h, depth) {
   if (depth >= 2) return;
   const canSplitVertically   = w >= 11;
   const canSplitHorizontally = h >= 11;
   if (!canSplitVertically && !canSplitHorizontally) return;
-  if (w < 15 && h < 15 && Math.random() < 0.15) return;          // sometimes keep a bigger room
+  if (w < 15 && h < 15 && Math.random() < 0.15) return;
 
   const vertical = canSplitVertically &&
     (!canSplitHorizontally || w > h || (w === h && Math.random() < 0.5));
 
   if (vertical) {
-    const wallX = x0 + 4 + rand(w - 8);                          // at least 4 free tiles each side
+    const wallX = x0 + 4 + rand(w - 8);
     const door  = y0 + rand(h - 2);
     for (let y = y0; y < y0 + h; y++) if (y < door || y >= door + 3) g[y][wallX] = 1;
     divide(g, x0, y0, wallX - x0, h, depth + 1);
@@ -96,7 +89,6 @@ function divide(g, x0, y0, w, h, depth) {
   }
 }
 
-// Flood fill from one floor tile: can we reach every other floor tile?
 function isConnected(g) {
   let start = -1;
   for (let y = 1; y < ROWS - 1 && start < 0; y++)
@@ -172,8 +164,6 @@ function isConnectedWithClearance(g, radius) {
 }
 
 
-// ── WORLD BUILDING ────────────────────────────────────────────────────────
-
 let clearanceCache = new Map();
 
 function buildWorld() {
@@ -212,7 +202,6 @@ function generateShrines() {
   return result;
 }
 
-// Draw square blocks with subtle seams and clean, continuous passage edges.
 function buildMapCanvas() {
   mapCanvas = document.createElement('canvas');
   mapCanvas.width = W; mapCanvas.height = H;
@@ -225,8 +214,6 @@ function buildMapCanvas() {
   for (let x = TILE; x < W; x += TILE) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, H); g.stroke(); }
   for (let y = TILE; y < H; y += TILE) { g.beginPath(); g.moveTo(0, y); g.lineTo(W, y); g.stroke(); }
 
-  // Blocks that touch are drawn as one connected shape: shadow first, then a solid fill with
-  // no seams, then edge shading only on sides that face the floor.
   const wall = (x, y) => x >= 0 && y >= 0 && x < COLS && y < ROWS && grid[y][x] !== 0;
   for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++)
     if (wall(x, y)) { g.fillStyle = '#090b11'; g.fillRect(x * TILE + 2, y * TILE + 5, TILE, TILE); }
@@ -245,9 +232,6 @@ function buildMapCanvas() {
 }
 
 
-// ── COLLISION ─────────────────────────────────────────────────────────────
-
-// Circle against a square wall; rounded corners come naturally from the circle test.
 function hitBlock(px, py, r, tx, ty) {
   const left = tx * TILE, top = ty * TILE;
   const right = left + TILE, bottom = top + TILE;
@@ -269,7 +253,6 @@ function hitBlock(px, py, r, tx, ty) {
   return { nx: face.nx, ny: face.ny, depth: r + face.distance };
 }
 
-// Deepest overlap with any wall near (x, y), or null
 function circleHit(x, y, r) {
   let best = null;
   const c0 = Math.max(0, Math.floor((x - r) / TILE)), c1 = Math.min(COLS - 1, Math.floor((x + r) / TILE));
@@ -285,7 +268,6 @@ function circleHit(x, y, r) {
 
 function collidesWalls(x, y, r) { return circleHit(x, y, r) !== null; }
 
-// Move by velocity, then push out of any wall (this makes characters slide along walls)
 function moveEntity(e, r, dt) {
   e.x += e.vx * dt;
   e.y += e.vy * dt;
@@ -299,7 +281,6 @@ function moveEntity(e, r, dt) {
   e.y = Math.max(r, Math.min(H - r, e.y));
 }
 
-// Walk along the line in 8 pixel steps. Any step inside a wall block blocks view.
 function lineOfSight(x1, y1, x2, y2) {
   const steps = Math.ceil(Math.hypot(x2 - x1, y2 - y1) / 8);
   for (let i = 1; i < steps; i++) {
@@ -312,8 +293,6 @@ function lineOfSight(x1, y1, x2, y2) {
   return true;
 }
 
-
-// ── PATHFINDING ───────────────────────────────────────────────────────────
 
 function walkableGrid(radius) {
   const clearance = Math.ceil(radius + 2);
@@ -360,7 +339,6 @@ function smoothPath(path, startX, startY, radius) {
   return result;
 }
 
-// Breadth-first search over floor cells wide enough for this enemy's radius.
 function findPath(ex, ey, tx, ty, radius = 0) {
   const walkable = walkableGrid(radius);
   let start = Math.floor(ey / TILE) * COLS + Math.floor(ex / TILE);

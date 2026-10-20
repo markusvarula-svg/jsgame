@@ -2,21 +2,19 @@
 //  config.js - every number you may want to tweak lives here
 // ════════════════════════════════════════════════════════════════════════════
 
-// ── WORLD ─────────────────────────────────────────────────────────────────
-const TILE = 48;                 // size of one map square in pixels
-const COLS = 38;                 // map width in tiles
-const ROWS = 28;                 // map height in tiles
-const W    = COLS * TILE;        // map width in pixels
-const H    = ROWS * TILE;        // map height in pixels
+const TILE = 48;
+const COLS = 38;
+const ROWS = 28;
+const W    = COLS * TILE;
+const H    = ROWS * TILE;
 const CAMERA_ZOOM = 1.25;
 const SHRINE_COUNT = 6;
 const SHRINE_HEAL = 70;
 
-const DIRS = [[1, 0], [-1, 0], [0, 1], [0, -1]];   // up, down, left, right
+const DIRS = [[1, 0], [-1, 0], [0, 1], [0, -1]];
 
-// ── PLAYER ────────────────────────────────────────────────────────────────
 const PLAYER_SIZE   = 18;
-const PLAYER_SPEED  = 160;       // pixels per second
+const PLAYER_SPEED  = 160;
 const PLAYER_MAX_HP = 200;
 
 const META_BONUS = {
@@ -25,39 +23,30 @@ const META_BONUS = {
   damageReduction: 0.05,
 };
 
-// ── GUN ───────────────────────────────────────────────────────────
 const BASE_WEAPON = {
-  damage:      25,               // damage of one bullet
-  bulletSpeed: 520,              // pixels per second
-  fireDelay:   0.6,              // seconds between trigger pulls
-  reload:      1.6,              // seconds to reload
-  magazine:    8,                // bullets before a reload
+  damage:      25,
+  bulletSpeed: 520,
+  fireDelay:   0.75,
 };
 
 const PER_CARD = {
-  damage:    0.20,               // +20% of base damage
-  damageReduction: 0.15,         // -15% incoming damage
-  speed:     0.25,               // +25% of base bullet speed
-  rate:      0.15,               // -15% of base fire delay
-  reload:    0.15,               // -15% of base reload time
-  magazine:  4,                  // +4 bullets in the magazine
-  spreadGap: 0.14,               // angle between neighbouring spread bullets (radians, about 8 degrees)
-  health:    40,                 // +40 max health (and heal 40)
-  move:      0.10,               // +10% of base walking speed
-  crit:      0.12,               // 12% chance to double damage
-  siphon:    6,                  // heal 6 HP on enemy kill
-  stun:      0.35,               // 0.35 seconds of slower movement per copy
-  homing:    0.12,               // homing strength per copy, in radians per frame-ish
+  damage:    0.20,
+  damageReduction: 0.15,
+  speed:     0.25,
+  rate:      0.15,
+  spreadGap: 0.14,
+  health:    40,
+  move:      0.10,
+  crit:      0.12,
+  siphon:    6,
+  stun:      0.35,
+  homing:    0.12,
 };
 
-const MIN_FIRE_DELAY = 0.15;     // stacking Fire Rate can never go below this
-const MIN_RELOAD     = 0.3;      // stacking Reload can never go below this
-const BURST_GAP      = 0.1;      // seconds between the shots of a burst
+const MIN_FIRE_DELAY = 0.15;
+const BURST_GAP      = 0.1;
 const BULLET_RADIUS  = 3;
 
-// Every offered card rolls its own rarity. weight = chance in %, bonus = stat multiplier.
-// Legendary is reserved for Time Stop (3% per card slot while you do not own it).
-// weight = chance in %, bonus = stat multiplier, color/rgb = border + back lines, glow = glow size (px), glowAlpha = glow strength
 const CARD_RARITY = {
   common:    { weight: 45, bonus: 1.00, label: 'COMMON',    color: '#9fb0d0', rgb: '159,176,208', glow: 6,  glowAlpha: 0.35 },
   uncommon:  { weight: 30, bonus: 1.25, label: 'UNCOMMON',  color: '#4fd08a', rgb: '79,208,138',  glow: 12, glowAlpha: 0.5  },
@@ -68,27 +57,21 @@ const CARD_RARITY = {
 
 const TIME_STOP = {
   chargeSeconds: 10,
-  windup: 1,                   // seconds of flash + glass building before it shatters
-  duration: 5,                   // seconds time stays stopped after the shatter
+  windup: 1,
+  duration: 5,
   maxCharge: 1,
 };
 
-// Explosion card
 const EXPLOSION = {
-  baseRadius:      55,           // radius with 1 card
-  radiusPerExtra:  25,           // +25 radius for every additional card
-  damageShare:     0.75,         // blast damage at the centre = 75% of bullet damage
-  edgeShare:       0.5,          // at the very edge the blast does 50% of the centre damage
+  baseRadius:      55,
+  radiusPerExtra:  25,
+  damageShare:     0.75,
+  edgeShare:       0.5,
 };
 
-// ── ENEMIES ───────────────────────────────────────────────────────────────
-const DETECT_RANGE = 440;        // enemies notice you inside this distance
-const CONTACT_DPS_FACTOR = 3;    // touching an enemy hurts (enemy damage * 3) per second
+const DETECT_RANGE = 440;
+const CONTACT_DPS_FACTOR = 3;
 
-// from      = first wave this enemy can appear in
-// weight    = how common it is compared with the others
-// bullets   = bullets per shot, gap = angle between them (a fan if bullets > 1)
-// burst     = shots in a row per trigger
 const ENEMY_TYPES = {
   red: {
     from: 1, weight: 5, hp: 90, speed: 90, wanderSpeed: 66, size: 16, points: 15, sides: 3,
@@ -135,26 +118,24 @@ const ENEMY_TYPES = {
   },
 };
 
-// ── WAVES ─────────────────────────────────────────────────────────────────
 const WAVE = {
-  baseEnemies:   4,              // enemies in a wave = 4 + 3 * wave number
+  baseEnemies:   4,
   perWave:       3,
-  maxAliveBase:  4,              // enemies alive at once = 4 + wave number, capped
-  maxAliveCap:   18,             // base cap, increased by 2 every 10 waves
+  maxAliveBase:  4,
+  maxAliveCap:   18,
   maxAlivePerTenWaves: 2,
-  spawnInterval: 0.8,            // seconds between spawns
-  spawnIntervalReduction: 0.1,   // seconds faster every 10 waves
+  spawnInterval: 0.8,
+  spawnIntervalReduction: 0.1,
   minSpawnInterval: 0.2,
-  breakTime:     5,              // seconds between waves
-  healShare:     0.3,            // health restored after a wave
-  hpGrowth:      0.17,           // +17% enemy health per wave
-  speedGrowth:   0.035,          // +3.5% enemy speed per wave
-  speedCap:      1.5,            // enemy speed bonus can never exceed +50%
-  damageGrowth:  0.065,          // +6.5% enemy damage per wave
-  rateGrowth:    0.03,           // +3% enemy fire rate per wave
-  rateCap:       3.0,            // enemy fire rate bonus can never exceed +200%
+  breakTime:     5,
+  healShare:     0.3,
+  hpGrowth:      0.17,
+  speedGrowth:   0.035,
+  speedCap:      1.5,
+  damageGrowth:  0.065,
+  rateGrowth:    0.03,
+  rateCap:       3.0,
 };
 
-// ── CARDS ─────────────────────────────────────────────────────────────────
-const CARD_COST_START = 60;      // points for the first card
-const CARD_COST_STEP  = 20;      // each card costs 20 more than the last
+const CARD_COST_START = 60;
+const CARD_COST_STEP  = 20;

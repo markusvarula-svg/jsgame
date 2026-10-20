@@ -34,7 +34,6 @@ function loadRunRecords() {
     .catch(() => showRunRecordStatus('RUN RECORDS UNAVAILABLE'));
 }
 
-// The server already returns the best runs, sorted
 function renderRunRecords(bestRuns) {
   const list = el('run-record-list');
   if (!list) return;

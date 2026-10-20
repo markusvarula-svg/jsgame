@@ -57,7 +57,6 @@ function saveMetaProgress() {
   try {
     localStorage.setItem(META_PROGRESS_KEY, JSON.stringify(metaProgress));
   } catch (error) {
-    // Keep this run playable if browser storage is unavailable or full.
   }
 }
 

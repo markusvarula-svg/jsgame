@@ -1,4 +1,4 @@
-// audio.js - all sound effects, synthesised with Web Audio (no files, no music). Press M to mute.
+// audio.js
 let actx = null, master = null, noiseBuf = null, muted = false;
 const lastPlayed = {};
 
@@ -34,7 +34,6 @@ function noise(dur, vol, f0, f1, type, delay) {
   s.connect(fl).connect(g).connect(master); s.start(t); s.stop(t + dur + 0.02);
 }
 
-// name: [minimum seconds between plays, function]
 const SFX = {
   shoot:      [0.03, () => { tone(900, 180, 0.12, 'square', 0.12); noise(0.06, 0.1, 4000, 800, 'highpass'); }],
   enemyShoot: [0.06, () => tone(480, 120, 0.14, 'sawtooth', 0.05)],
@@ -44,8 +43,6 @@ const SFX = {
   death:      [0.05, () => { noise(0.3, 0.22, 1500, 150); tone(300, 60, 0.3, 'sawtooth', 0.12); }],
   hurt:       [0.14, () => { tone(160, 70, 0.2, 'sawtooth', 0.22); noise(0.12, 0.15, 900, 200); }],
   explosion:  [0.05, () => { noise(0.55, 0.4, 1400, 70); tone(95, 35, 0.45, 'sine', 0.35); }],
-  reload:     [0.1,  () => { tone(320, 200, 0.07, 'square', 0.08); tone(200, 320, 0.07, 'square', 0.08, 0.12); }],
-  reloaded:   [0.1,  () => { tone(500, 800, 0.06, 'square', 0.09); tone(800, 1000, 0.08, 'square', 0.09, 0.07); }],
   ping:       [0.3,  () => tone(1200, 900, 0.5, 'sine', 0.08)],
   alarm:      [0.3,  () => { tone(700, 700, 0.1, 'square', 0.08); tone(500, 500, 0.1, 'square', 0.08, 0.12); }],
   wave:       [0.3,  () => { tone(300, 300, 0.15, 'square', 0.1); tone(400, 400, 0.15, 'square', 0.1, 0.15); tone(600, 600, 0.3, 'square', 0.1, 0.3); }],
@@ -58,7 +55,6 @@ const SFX = {
   shrine:     [0.3,  () => { tone(400, 1000, 0.4, 'sine', 0.14); tone(600, 1500, 0.4, 'sine', 0.1, 0.1); }],
   gameover:   [1,    () => { tone(300, 40, 1, 'sawtooth', 0.28); noise(0.9, 0.2, 800, 60); }],
   ready:      [0.5,  () => { tone(880, 880, 0.12, 'sine', 0.13); tone(1320, 1320, 0.25, 'sine', 0.13, 0.1); }],
-  // Time stop: charge-up zap -> glass shatter -> release
   halt:       [0.5,  () => { tone(120, 1500, 0.85, 'sawtooth', 0.1); tone(60, 400, 0.85, 'sine', 0.2); noise(0.3, 0.2, 3000, 8000, 'highpass'); }],
   shatter:    [0.5,  () => {
     noise(0.7, 0.35, 3000, 9000, 'highpass'); tone(130, 40, 0.5, 'sine', 0.4);

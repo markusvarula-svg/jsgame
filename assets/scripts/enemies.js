@@ -2,8 +2,6 @@
 //  enemies.js - waves, enemy spawning, enemy AI and enemy shooting
 // ════════════════════════════════════════════════════════════════════════════
 
-// ── WAVES ─────────────────────────────────────────────────────────────────
-
 function enemiesInWave(n)  { return WAVE.baseEnemies + WAVE.perWave * n; }
 function maxAlive() {
   const milestoneBonus = WAVE.maxAlivePerTenWaves * Math.floor(wave / 10);
@@ -55,7 +53,6 @@ function updateWave(dt) {
   }
 }
 
-// Random type among those unlocked, more likely if the type has a higher weight
 function pickEnemyType() {
   const unlocked = Object.keys(ENEMY_TYPES).filter(k => ENEMY_TYPES[k].from <= wave);
   let totalWeight = 0;
@@ -69,7 +66,6 @@ function pickEnemyType() {
   return unlocked[0];
 }
 
-// Returns false if no good spot was found (the game simply tries again soon)
 function waveMultiplier(growthPerWave, wavesPassed, cap = Infinity) {
   const scaled = 1 + growthPerWave * wavesPassed;
   return cap === Infinity ? scaled : Math.min(cap, scaled);
@@ -79,7 +75,6 @@ function spawnEnemy(type) {
   const cfg = ENEMY_TYPES[type];
   const wavesPassed = Math.max(0, wave - 1);
 
-  // Enemies get stronger every wave.
   const hpScale = waveMultiplier(WAVE.hpGrowth, wavesPassed);
   const speedScale = waveMultiplier(WAVE.speedGrowth, wavesPassed, WAVE.speedCap);
   const damageScale = 1 + WAVE.damageGrowth * wavesPassed;
@@ -87,10 +82,10 @@ function spawnEnemy(type) {
 
   for (let tries = 0; tries < 200; tries++) {
     const tx = 1 + rand(COLS - 2), ty = 1 + rand(ROWS - 2);
-    if (grid[ty][tx] !== 0) continue;                           // never on a triangle block
+    if (grid[ty][tx] !== 0) continue;
     const x = tx * TILE + TILE / 2, y = ty * TILE + TILE / 2;
-    if (Math.hypot(x - player.x, y - player.y) < 260) continue; // not right next to the player
-    if (circleHit(x, y, cfg.size + 4)) continue;                // not touching a wall
+    if (Math.hypot(x - player.x, y - player.y) < 260) continue;
+    if (circleHit(x, y, cfg.size + 4)) continue;
 
     enemies.push({
       x, y, vx: 0, vy: 0, angle: Math.random() * Math.PI * 2,
@@ -118,9 +113,6 @@ function spawnEnemy(type) {
 }
 
 
-// ── ENEMY SHOOTING ────────────────────────────────────────────────────────
-
-// One enemy shot: cfg.bullets bullets in a fan (1 bullet = straight shot)
 function enemyFire(e) {
   sfx('enemyShoot');
   const cfg = ENEMY_TYPES[e.type];
@@ -171,9 +163,6 @@ function updateEnemyShooting(e, dt) {
 }
 
 
-// ── ENEMY AI ──────────────────────────────────────────────────────────────
-// wander -> (sees player) alert for 1s -> chase and shoot
-
 function updateEnemies(dt) {
   for (const e of enemies) {
     if (e.hp <= 0) continue;
@@ -190,7 +179,6 @@ function updateEnemies(dt) {
     } else {
       const canSee = lineOfSight(e.x, e.y, player.x, player.y);
 
-      // Stuck detection: if barely moved for 0.45s, pick a new direction
       e.stuckTimer -= dt;
       if (e.stuckTimer <= 0) {
         if (Math.hypot(e.x - e.lastX, e.y - e.lastY) < 6 && e.state !== 'alert') {
@@ -211,7 +199,6 @@ function updateEnemies(dt) {
       else                           updateChase(e, dt, dist, canSee);
     }
 
-    // Touching an enemy hurts
     if (dist < PLAYER_SIZE + e.size) {
       sfx('hurt');
       damagePlayer(e.damage * CONTACT_DPS_FACTOR * dt);
@@ -222,7 +209,6 @@ function updateEnemies(dt) {
 }
 
 function removeDeadEnemies() {
-  // Remove dead enemies and award points
   enemies = enemies.filter(e => {
     if (e.hp > 0) return true;
     kills++;
@@ -343,16 +329,15 @@ function updateChase(e, dt, dist, canSee) {
     e.pathTimer = 0;
   }
 
-  // Choose a direction: follow the path, or keep the preferred distance, or strafe
   let desired;
   if (!directRoute && e.path.length > 0) {
     desired = Math.atan2(e.path[0].y - e.y, e.path[0].x - e.x);
   } else if (dist > cfg.prefDist + 35) {
-    desired = e.angle;                         // too far: move closer
+    desired = e.angle;
   } else if (dist < cfg.prefDist - 35) {
-    desired = e.angle + Math.PI;               // too close: back off
+    desired = e.angle + Math.PI;
   } else {
-    desired = e.angle + Math.PI / 2 * (Math.sin(Date.now() / 550 + e.x) > 0 ? 1 : -1);   // strafe
+    desired = e.angle + Math.PI / 2 * (Math.sin(Date.now() / 550 + e.x) > 0 ? 1 : -1);
   }
   if (directRoute && (e.dodgeVx || e.dodgeVy)) desired = Math.atan2(e.dodgeVy, e.dodgeVx);
 
@@ -366,7 +351,6 @@ function updateChase(e, dt, dist, canSee) {
   if (canSee) updateEnemyShooting(e, dt);
 }
 
-// Sidestep a player bullet that is flying towards the enemy
 function updateDodge(e, dt) {
   e.dodgeTimer -= dt;
   if (e.dodgeTimer > 0) return;
@@ -375,7 +359,7 @@ function updateDodge(e, dt) {
   let threat = null;
   for (const b of bullets) {
     const bx = b.x - e.x, by = b.y - e.y, d = Math.hypot(bx, by);
-    const comingAtMe = (b.vx * bx + b.vy * by) / (d || 1) > 0;   // moving away from the enemy? dot > 0
+    const comingAtMe = (b.vx * bx + b.vy * by) / (d || 1) > 0;
     if (d < 140 && comingAtMe) { threat = b; break; }
   }
   if (threat) {
@@ -388,7 +372,6 @@ function updateDodge(e, dt) {
   }
 }
 
-// Wall avoidance: if the way ahead is blocked, try other directions
 function wallSteer(e, desired) {
   const lookAhead = e.size * 3.8;
   if (!probeHit(e.x, e.y, desired, lookAhead, e.size)) return desired;

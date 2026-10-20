@@ -7,9 +7,9 @@ function render() {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.save();
   ctx.scale(CAMERA_ZOOM, CAMERA_ZOOM);
-  ctx.translate(-camX, -camY);                    // zoomed camera
+  ctx.translate(-camX, -camY);
 
-  ctx.drawImage(mapCanvas, 0, 0);                 // walls and floor were drawn once in map.js
+  ctx.drawImage(mapCanvas, 0, 0);
   drawShrines();
   drawParticles();
   drawBullets();
@@ -22,12 +22,8 @@ function render() {
   if (timeStopPhase === 'windup' || timeStopPhase === 'paused') drawHalt(haltElapsed());
 }
 
-// ── TIME STOP: "Halt" glass effect (blue) ────────────────────────────────
-// 0 .. TIME_STOP.windup : white flash, glass panels pop in, neon lines grow
-// at TIME_STOP.windup   : panels shatter and vanish, lines fade out slowly
-// the world stays frozen until TIME_STOP.duration has run out
 let haltMesh = null;
-const HALT = { flash: 0.26, build: 0.42, shatter: 0.5, lineFade: 1.1 };   // seconds
+const HALT = { flash: 0.26, build: 0.42, shatter: 0.5, lineFade: 1.1 };
 
 function haltElapsed() {
   return timeStopPhase === 'windup'
@@ -65,8 +61,8 @@ function buildHaltMesh() {
 function drawHalt(e) {
   if (!haltMesh) buildHaltMesh();
   const sw = canvas.width, sh = canvas.height, S = TIME_STOP.windup;
-  const sp = clamp((e - S) / HALT.shatter, 0, 1), se = 1 - Math.pow(1 - sp, 3);   // shatter progress
-  const lf = 1 - clamp((e - S) / HALT.lineFade, 0, 1);                              // line brightness
+  const sp = clamp((e - S) / HALT.shatter, 0, 1), se = 1 - Math.pow(1 - sp, 3);
+  const lf = 1 - clamp((e - S) / HALT.lineFade, 0, 1);
   const shake = e > S && e < S + 0.26 ? (1 - (e - S) / 0.26) * 14 : 0;
 
   ctx.save();
@@ -118,10 +114,10 @@ function drawHalt(e) {
   const v = ctx.createRadialGradient(sw / 2, sh / 2, Math.min(sw, sh) * 0.25, sw / 2, sh / 2, Math.hypot(sw, sh) * 0.6);
   v.addColorStop(0, 'rgba(0,20,50,0)'); v.addColorStop(1, 'rgba(0,25,60,' + (0.6 * lf) + ')');
   ctx.fillStyle = v; ctx.fillRect(0, 0, sw, sh);
-  if (e > S) { ctx.fillStyle = 'rgba(90,170,255,0.06)'; ctx.fillRect(0, 0, sw, sh); }   // faint blue tint while frozen
+  if (e > S) { ctx.fillStyle = 'rgba(90,170,255,0.06)'; ctx.fillRect(0, 0, sw, sh); }
 
-  let fl = e < 0.04 ? e / 0.04 : 1 - clamp((e - 0.04) / (HALT.flash - 0.04), 0, 1);     // white flash
-  if (e > S) fl = Math.max(fl, 0.6 * (1 - clamp((e - S) / 0.22, 0, 1)));                // second flash on shatter
+  let fl = e < 0.04 ? e / 0.04 : 1 - clamp((e - 0.04) / (HALT.flash - 0.04), 0, 1);
+  if (e > S) fl = Math.max(fl, 0.6 * (1 - clamp((e - S) / 0.22, 0, 1)));
   if (fl > 0) { ctx.fillStyle = 'rgba(255,255,255,' + fl + ')'; ctx.fillRect(0, 0, sw, sh); }
 }
 
@@ -148,7 +144,7 @@ function drawShrines() {
 
 function drawBullets() {
   for (const b of bullets) {
-    ctx.fillStyle = b.blastRadius > 0 ? '#ffb040' : '#6fe3ff';   // explosive bullets are orange
+    ctx.fillStyle = b.blastRadius > 0 ? '#ffb040' : '#6fe3ff';
     ctx.beginPath();
     ctx.arc(b.x, b.y, b.blastRadius > 0 ? 4 : 3, 0, Math.PI * 2);
     ctx.fill();
@@ -207,7 +203,7 @@ function drawEnemies() {
     }
     ctx.restore();
 
-    if (e.hp < e.maxHp) {                                             // health bar only when hurt
+    if (e.hp < e.maxHp) {
       const barWidth = e.size * 2.4;
       ctx.fillStyle = '#220000';
       ctx.fillRect(e.x - barWidth / 2, e.y - e.size - 13, barWidth, 4);
@@ -227,7 +223,7 @@ function drawPlayer() {
   ctx.strokeStyle = '#88aaff';
   ctx.lineWidth   = 2;
   ctx.strokeRect(-s, -s, s * 2, s * 2);
-  ctx.fillStyle = '#b8c4ff';                                          // pistol barrel
+  ctx.fillStyle = '#b8c4ff';
   ctx.fillRect(s - 2, -3, 14, 6);
   ctx.restore();
 }
@@ -240,8 +236,6 @@ function drawCrosshair() {
   ctx.beginPath(); ctx.moveTo(wx, wy - 10); ctx.lineTo(wx, wy + 10); ctx.stroke();
 }
 
-
-// ── PARTICLES ─────────────────────────────────────────────────────────────
 
 function spawnBurst(x, y, color, count, speed, life) {
   for (let i = 0; i < count; i++)
@@ -257,7 +251,7 @@ function updateParticles(dt) {
   for (const p of particles) {
     p.x += p.vx * dt;
     p.y += p.vy * dt;
-    p.vx *= 0.9;                                  // slow down a little every frame
+    p.vx *= 0.9;
     p.vy *= 0.9;
     p.life -= dt;
   }
@@ -266,9 +260,9 @@ function updateParticles(dt) {
 
 function drawParticles() {
   for (const p of particles) {
-    const t = p.life / p.maxLife;                 // 1 = just born, 0 = gone
+    const t = p.life / p.maxLife;
     ctx.globalAlpha = t;
-    if (p.ring) {                                 // explosion ring grows to the blast radius
+    if (p.ring) {
       ctx.strokeStyle = p.color;
       ctx.lineWidth   = 3;
       ctx.beginPath();

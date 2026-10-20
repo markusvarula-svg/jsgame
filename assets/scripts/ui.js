@@ -37,11 +37,8 @@ function updateHUD() {
   el('score-text').textContent = 'SCORE: ' + score + ' | KILLS: ' + kills;
 
   el('weapon-name').textContent  = 'PISTOL';
-  el('ammo-display').textContent = player.gun.ammo + ' / ' + magazineSize();
-  el('reload-msg').style.display = player.gun.reloading ? 'block' : 'none';
 }
 
-// List of cards the player owns, with how many copies
 function updateOwned() {
   const lines = CARDS
     .filter(c => player.cards[c.id])
@@ -49,7 +46,6 @@ function updateOwned() {
   el('owned-cards').innerHTML = lines.length ? 'UPGRADES<br>' + lines.join('<br>') : '';
 }
 
-// Enemy types the player has met so far, drawn in their own colour
 function updateLegend() {
   el('legend').innerHTML = Object.keys(ENEMY_TYPES)
     .filter(k => ENEMY_TYPES[k].from <= wave)

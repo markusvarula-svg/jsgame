@@ -1,51 +1,28 @@
 // ════════════════════════════════════════════════════════════════════════════
 //  weapon.js - the player's one pistol and everything the cards do to it
-//
-//  Rule of thumb for every stat below:  final value = base value, changed by
-//  (card amount) x (number of copies of that card you own).
 // ════════════════════════════════════════════════════════════════════════════
 
-// How many copies of a card the player owns (0 if none)
 function cardCount(id) { return player.cards[id] || 0; }
 
-// Total strength of the copies you own: each copy adds the bonus of the rarity it was taken at
 function cardPower(id) { return (player.cardPower && player.cardPower[id]) || 0; }
 
 
-// ── WEAPON STATS (all plain arithmetic) ───────────────────────────────────
-
-// Damage card: +20% of base per copy.   25 -> 30 -> 35 -> 40 ...
 function bulletDamage() {
   return BASE_WEAPON.damage * (1 + META_BONUS.damage * shopLevel('damage')) *
     (1 + PER_CARD.damage * cardPower('damage'));
 }
 
-// Bullet Speed card: +25% of base per copy.
 function bulletSpeed() {
   return BASE_WEAPON.bulletSpeed * (1 + PER_CARD.speed * cardPower('speed'));
 }
 
-// Ammo Capacity card: +4 bullets per copy.   8 -> 12 -> 16 ...
-function magazineSize() {
-  return Math.round(BASE_WEAPON.magazine + PER_CARD.magazine * cardPower('ammo'));
-}
-
-// Reload Speed card: -15% of base time per copy, but never below the minimum.
-function reloadTime() {
-  const time = BASE_WEAPON.reload * (1 - PER_CARD.reload * cardPower('reload'));
-  return Math.max(MIN_RELOAD, time);
-}
-
-// Fire Rate card: -15% of base delay per copy, but never below the minimum.
 function fireDelay() {
   const delay = BASE_WEAPON.fireDelay * (1 - PER_CARD.rate * cardPower('rate'));
   return Math.max(MIN_FIRE_DELAY, delay);
 }
 
-// Burst card: each copy adds one more shot to every trigger pull.
 function shotsPerTrigger() { return 1 + cardPower('burst'); }
 
-// Spread card: each copy adds one more bullet to every shot, fired as a fan.
 function bulletsPerShot() { return 1 + cardPower('spread'); }
 
 function critChance() {
@@ -60,19 +37,15 @@ function stunDuration() {
   return PER_CARD.stun * cardPower('stun');
 }
 
-// Bounce and Pierce cards: one wall bounce / one enemy pass-through per copy.
 function bounceCount() { return cardPower('bounce'); }
 function pierceCount() { return cardPower('pierce'); }
 
-// Explosion card: 0 copies = no explosion. 1 copy = base radius, then +25 per extra copy.
 function explosionRadius() {
   const power = cardPower('explosion');
   if (power === 0) return 0;
   return EXPLOSION.baseRadius + EXPLOSION.radiusPerExtra * (power - 1);
 }
 
-// Angle offsets for a fan of N bullets, centred on the aim direction.
-// Example: 3 bullets with gap 0.14 gives -0.14, 0, +0.14 (radians).
 function fanAngles(count, gap) {
   const angles = [];
   for (let i = 0; i < count; i++) angles.push((i - (count - 1) / 2) * gap);
@@ -86,20 +59,9 @@ function normalizeAngle(angle) {
 }
 
 
-// ── FIRING ────────────────────────────────────────────────────────────────
-// One trigger pull uses 1 ammo and fires shotsPerTrigger() shots, BURST_GAP apart.
-// Every shot fires bulletsPerShot() bullets in a fan.
-
 function updateWeapon(dt) {
   const gun = player.gun;
 
-  // Reloading
-  if (gun.reloading) {
-    gun.reloadTimer -= dt;
-    if (gun.reloadTimer <= 0) { gun.ammo = magazineSize(); gun.reloading = false; sfx('reloaded'); }
-  }
-
-  // Remaining shots of a burst
   if (gun.shotsLeft > 0) {
     gun.shotTimer -= dt;
     if (gun.shotTimer <= 0) {
@@ -109,29 +71,13 @@ function updateWeapon(dt) {
     }
   }
 
-  // Pulling the trigger
-  if (mouseDown && !gun.reloading && gun.fireTimer <= 0 && gun.shotsLeft === 0) {
-    if (gun.ammo > 0) {
-      fireShot();
-      gun.ammo--;
-      gun.shotsLeft = shotsPerTrigger() - 1;
-      gun.shotTimer = BURST_GAP;
-      gun.fireTimer = fireDelay() + (shotsPerTrigger() - 1) * BURST_GAP;   // wait for the burst to finish
-      if (gun.ammo <= 0) startReload();
-    } else {
-      startReload();
-    }
+  if (mouseDown && gun.fireTimer <= 0 && gun.shotsLeft === 0) {
+    fireShot();
+    gun.shotsLeft = shotsPerTrigger() - 1;
+    gun.shotTimer = BURST_GAP;
+    gun.fireTimer = fireDelay() + (shotsPerTrigger() - 1) * BURST_GAP;
   }
   if (gun.fireTimer > 0) gun.fireTimer -= dt;
-
-  // Manual reload
-  if (keys['r'] && !gun.reloading && gun.ammo < magazineSize()) startReload();
-}
-
-function startReload() {
-  sfx('reload');
-  player.gun.reloading   = true;
-  player.gun.reloadTimer = reloadTime();
 }
 
 function fireShot() {
@@ -149,27 +95,23 @@ function fireShot() {
       damage: bulletDamage(),
       bouncesLeft: bounceCount(),
       piercesLeft: pierceCount(),
-      blastRadius: explosionRadius(),     // 0 = this bullet does not explode
-      hit: new Set(),                     // enemies already pierced (so one enemy is hit once)
+      blastRadius: explosionRadius(),
+      hit: new Set(),
       life: 2.5,
     });
   }
 }
 
 
-// ── BULLETS ───────────────────────────────────────────────────────────────
-
-// enemyDt lets time stop slow or freeze enemy bullets while the player's own bullets keep full speed
 function updateBullets(dt, enemyDt = dt) {
   for (const b of bullets) {
-    // Move in small steps so fast bullets cannot jump through a thin triangle tip
     const steps = Math.max(1, Math.ceil(Math.hypot(b.vx, b.vy) * dt / 8));
     for (let s = 0; s < steps && !b.dead; s++) stepPlayerBullet(b, dt / steps);
     b.life -= dt;
     if (b.life <= 0) b.dead = true;
   }
   for (const b of eBullets) {
-    if (enemyDt <= 0) break;                       // time stop: enemy bullets hang in place
+    if (enemyDt <= 0) break;
     const steps = Math.max(1, Math.ceil(Math.hypot(b.vx, b.vy) * enemyDt / 8));
     for (let s = 0; s < steps && !b.dead; s++) stepEnemyBullet(b, enemyDt / steps);
     b.life -= enemyDt;
@@ -208,15 +150,13 @@ function stepPlayerBullet(b, dt) {
   b.x += b.vx * dt;
   b.y += b.vy * dt;
 
-  // Hit a wall
   const wall = circleHit(b.x, b.y, BULLET_RADIUS);
   if (wall) {
-    if (b.blastRadius > 0) explode(b.x, b.y, b.blastRadius, b.damage);   // explodes on every bounce too
+    if (b.blastRadius > 0) explode(b.x, b.y, b.blastRadius, b.damage);
     sfx('wall');
     spawnBurst(b.x, b.y, '#d8c060', 3, 160, 0.15);
 
     if (b.bouncesLeft > 0) {
-      // Mirror the velocity around the wall's surface direction
       const into = b.vx * wall.nx + b.vy * wall.ny;
       if (into < 0) { b.vx -= 2 * into * wall.nx; b.vy -= 2 * into * wall.ny; }
       b.x += wall.nx * (wall.depth + 0.5);
@@ -228,7 +168,6 @@ function stepPlayerBullet(b, dt) {
     return;
   }
 
-  // Hit an enemy
   for (const e of enemies) {
     if (e.hp <= 0 || b.hit.has(e)) continue;
     if (Math.hypot(b.x - e.x, b.y - e.y) >= e.size + BULLET_RADIUS) continue;
@@ -236,7 +175,7 @@ function stepPlayerBullet(b, dt) {
     const critRoll = Math.random();
     const criticalHit = critRoll < critChance();
     const damage = criticalHit ? b.damage * 2 : b.damage;
-    if (b.blastRadius > 0) explode(b.x, b.y, b.blastRadius, b.damage);   // explodes on every pierce too
+    if (b.blastRadius > 0) explode(b.x, b.y, b.blastRadius, b.damage);
     else                   e.hp -= damage;
     sfx(criticalHit ? 'crit' : 'hit');
     if (criticalHit) spawnBurst(e.x, e.y, '#ffe77a', 4, 180, 0.35);
@@ -261,8 +200,6 @@ function damagePlayer(amount) {
   if (player.hp <= 0) endGame();
 }
 
-// Blast damage = bullet damage at the centre, shrinking linearly to the edge value.
-// The explosion never hurts the player.
 function radialDamageFalloff(distance, radius, maxDamage, minimumShare) {
   if (radius <= 0) return 0;
   const distanceRatio = clamp(distance / radius, 0, 1);

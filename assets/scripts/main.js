@@ -10,7 +10,7 @@ function init() {
 
   window.addEventListener('keydown', e => {
     const k = e.key.toLowerCase();
-    if (typeof isCheatShortcut === 'function' && isCheatShortcut(e) && !e.repeat) {   // only exists in index.dev.html
+    if (typeof isCheatShortcut === 'function' && isCheatShortcut(e) && !e.repeat) {
       e.preventDefault();
       toggleCheatPanel();
       return;
@@ -46,7 +46,7 @@ function init() {
   el('shop-open-over').addEventListener('click', openShop);
   initShop();
   initRunRecords();
-  if (typeof initCheats === 'function') initCheats();   // cheats.js is not loaded on the public site
+  if (typeof initCheats === 'function') initCheats();
 
   setupGame();
   requestAnimationFrame(loop);
@@ -85,8 +85,6 @@ function showMenu() {
 }
 
 
-// ── SETUP ─────────────────────────────────────────────────────────────────
-
 function setupGame() {
   kills = 0; score = 0;
   cardProgress = 0; cardCost = CARD_COST_START; cardsTaken = 0; paidCardsTaken = 0;
@@ -106,12 +104,10 @@ function setupGame() {
   player = {
     x: 2.5 * TILE, y: 2.5 * TILE, vx: 0, vy: 0, angle: 0,
     hp: maxHp, maxHp, size: PLAYER_SIZE,
-    cards: {},                                    // card id -> number of copies owned
-    cardPower: {},                                // card id -> summed rarity bonus of those copies
-    gun: {                                        // the one pistol
-      ammo: BASE_WEAPON.magazine,
+    cards: {},
+    cardPower: {},
+    gun: {
       fireTimer: 0, shotsLeft: 0, shotTimer: 0,
-      reloading: false, reloadTimer: 0,
     },
   };
 
@@ -127,13 +123,11 @@ function setupGame() {
 }
 
 
-// ── LOOP ──────────────────────────────────────────────────────────────────
-
 function loop(ts) {
-  const dt = Math.min((ts - last) / 1000, 0.05);   // seconds since last frame (max 0.05)
+  const dt = Math.min((ts - last) / 1000, 0.05);
   last = ts;
 
-  if (state === 'play') update(dt);                // menu, cards and game over are frozen
+  if (state === 'play') update(dt);
   updateBanner(dt);
   render();
   requestAnimationFrame(loop);
@@ -168,7 +162,7 @@ function update(dt) {
     }
   }
 
-  if (timeStopPhase !== 'ready') {      // time is stopped: the player can still move and shoot
+  if (timeStopPhase !== 'ready') {
     updateFrozenWorld(dt);
     return;
   }
@@ -188,18 +182,13 @@ function update(dt) {
   updateCamera();
   updateHUD();
 
-  // Enough points: open the card picker (this freezes the game)
   if (state === 'play' && cardProgress >= cardCost) openCards();
 }
 
-// Time stop. The player always moves and shoots at normal speed.
-// Wind-up: the rest of the world slows down smoothly from full speed to a standstill (it eases out,
-// so it starts slowing gently and is fully stopped the moment the glass shatters).
-// After the shatter: enemies, enemy bullets and the wave timer are completely frozen.
 function updateFrozenWorld(dt) {
   let scale = 0;
   if (timeStopPhase === 'windup') {
-    const left = clamp(timeStopWindup / TIME_STOP.windup, 0, 1);   // 1 -> 0 over the wind-up
+    const left = clamp(timeStopWindup / TIME_STOP.windup, 0, 1);
     scale = left * left;
   }
   const worldDt = dt * scale;
@@ -207,7 +196,7 @@ function updateFrozenWorld(dt) {
   updatePlayer(dt);
   updateShrines();
   if (worldDt > 0) { updateEnemies(worldDt); updateWave(worldDt); } else removeDeadEnemies();
-  updateBullets(dt, worldDt);           // your bullets keep full speed, enemy bullets use worldDt
+  updateBullets(dt, worldDt);
   updateParticles(dt);
   updateCamera();
   updateHUD();
@@ -265,14 +254,11 @@ function updateCamera() {
 }
 
 
-// ── END ───────────────────────────────────────────────────────────────────
-
 function endGame() {
   if (state === 'over') return;
   state = 'over';
   mouseDown = false;
   player.hp = 0;
-  // A run that used any cheat earns no scrap and is not saved to the leaderboard
   const salvageEarned = cheatsUsed ? 0 : Math.max(10, Math.floor(score / 5) + wave * 5);
   if (!cheatsUsed) {
     metaProgress.credits += salvageEarned;
