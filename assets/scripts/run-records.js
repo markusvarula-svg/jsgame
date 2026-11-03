@@ -9,6 +9,8 @@ function initRunRecords() {
 }
 
 function saveRunRecord(record) {
+  if (window.CUBE_WARS_DEV) return Promise.resolve();
+
   return fetch(RUN_API_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
