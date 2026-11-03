@@ -35,8 +35,6 @@ function updateHUD() {
     ? 'ENEMIES LEFT: ' + (enemies.length + toSpawn)
     : 'NEXT WAVE IN ' + Math.ceil(Math.max(0, intermission));
   el('score-text').textContent = 'SCORE: ' + score + ' | KILLS: ' + kills;
-
-  el('weapon-name').textContent  = 'PISTOL';
 }
 
 function updateOwned() {

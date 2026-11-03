@@ -150,9 +150,9 @@ function drawBullets() {
     ctx.fill();
   }
   for (const b of eBullets) {
-    ctx.fillStyle = b.blastRadius > 0 ? '#ffb040' : '#ff6a3c';
+    ctx.fillStyle = b.blastRadius > 0 ? '#ffb040' : b.homingTurnRate > 0 ? '#e08cff' : '#ff6a3c';
     ctx.beginPath();
-    ctx.arc(b.x, b.y, b.blastRadius > 0 ? 5 : 3, 0, Math.PI * 2);
+    ctx.arc(b.x, b.y, b.blastRadius > 0 ? 5 : b.homingTurnRate > 0 ? 4 : 3, 0, Math.PI * 2);
     ctx.fill();
   }
 }

@@ -39,7 +39,6 @@ const PER_CARD = {
   move:      0.10,
   crit:      0.12,
   siphon:    6,
-  stun:      0.35,
   homing:    0.12,
 };
 
@@ -85,36 +84,47 @@ const ENEMY_TYPES = {
   },
   purple: {
     from: 4, weight: 2, hp: 240, speed: 42, wanderSpeed: 38, size: 20, points: 30, sides: 0,
-    damage: 12, fireDelay: 2.2, bulletSpeed: 340, bullets: 3, gap: 0.2, burst: 1, prefDist: 130,
-    color: '#a040e0', dark: '#60269a', line: '#d9a0ff', info: 'PURPLE - tank, fires a spread shot',
+    damage: 12, fireDelay: 2.2, bulletSpeed: 425, bullets: 3, gap: 0.4, burst: 1, prefDist: 130,
+    color: '#a040e0', dark: '#60269a', line: '#d9a0ff', info: 'PURPLE - tanky and fires three bullets in a spread',
   },
   green: {
     from: 6, weight: 2, hp: 78, speed: 60, wanderSpeed: 50, size: 15, points: 25, sides: 4,
     damage: 50, fireDelay: 3.2, bulletSpeed: 800, bullets: 1, gap: 0, burst: 1, prefDist: 340,
-    color: '#40c060', dark: '#246e38', line: '#a0ffb8', info: 'GREEN - marksman, slow and high damage',
+    color: '#40c060', dark: '#246e38', line: '#a0ffb8', info: 'GREEN - fast bullets, slow speed and high damage',
   },
   orange: {
     from: 8, weight: 1, hp: 150, speed: 55, wanderSpeed: 44, size: 18, points: 35, sides: 6,
-    damage: 13, fireDelay: 2.4, bulletSpeed: 400, bullets: 1, gap: 0, burst: 3, prefDist: 200,
-    color: '#e88a28', dark: '#8c5216', line: '#ffd09a', info: 'ORANGE - fires burst shots',
+    damage: 13, fireDelay: 2.4, bulletSpeed: 450, bullets: 2, gap: 0.4, burst: 2, prefDist: 200,
+    color: '#e88a28', dark: '#8c5216', line: '#ffd09a', info: 'ORANGE - ',
   },
-  siege: {
-    from: 10, weight: 1, hp: 325, speed: 52, wanderSpeed: 42, size: 24, points: 50, sides: 0,
-    damage: 22, fireDelay: 2.8, bulletSpeed: 300, bullets: 1, gap: 0, burst: 1,
-    prefDist: 230, blastRadius: 55, blastRadiusGrowth: 0.12, blastRadiusCap: PLAYER_SIZE * 5,
-    color: '#b84a36', dark: '#702b24', line: '#ffad8c', info: 'SIEGE - fires growing explosive blasts',
+  rocketeer: {
+    from: 10, weight: 1, hp: 225, speed: 52, wanderSpeed: 42, size: 18, points: 50, sides: 0,
+    damage: 22, fireDelay: 2.8, bulletSpeed: 400, bullets: 1, gap: 0, burst: 2,
+    prefDist: 230, blastRadius: 55, blastRadiusGrowth: 0.12, blastRadiusCap: 18 * 5,
+    color: '#b84a36', dark: '#702b24', line: '#ffad8c', info: 'ROCKETEER - fires explosive bullets',
   },
   turret: {
-    from: 12, weight: 1, hp: 750, speed: 0, wanderSpeed: 0, size: 22, points: 65, sides: 5,
+    from: 12, weight: 1, hp: 550, speed: 0, wanderSpeed: 0, size: 22, points: 65, sides: 5,
     damage: 14, fireDelay: 0.5, bulletSpeed: 100, bullets: 5, gap: 0, burst: 1,
     prefDist: 0, spinSpeed: 2, turret: true,
-    color: '#c0fff3', dark: '#1d695d', line: '#9affe8', info: 'TURRET - stationary, spins and fires in five directions',
+    color: '#c0fff3', dark: '#1d695d', line: '#9affe8', info: 'TURRET - stationary and fires in five directions',
   },
   scanner: {
     from: 8, weight: 2, hp: 55, speed: 78, wanderSpeed: 78, size: 16, points: 25, sides: 0,
     damage: 0, fireDelay: 0, bulletSpeed: 0, bullets: 0, gap: 0, burst: 0,
     prefDist: 0, scanner: true, pingRange: 420, pingDuration: 1.2, pingInterval: 5,
-    color: '#00862b', dark: '#163f23', line: '#a3ffb2', info: 'SCANNER - flies and alerts nearby enemies with green pings',
+    color: '#00862b', dark: '#163f23', line: '#a3ffb2', info: 'SCANNER - flies and alerts nearby enemies with pings',
+  },
+  redV2: {
+    from: 10, weight: 1, hp: 100, speed: 75, wanderSpeed: 55, size: 18, points: 40, sides: 3,
+    damage: 8, fireDelay: 3.2, bulletSpeed: 300, bullets: 3, gap: 0.3, burst: 2, prefDist: 210,
+    color: '#f04a50', dark: '#79232d', line: '#ffb0a8', info: 'RED V2 - ',
+  },
+  greenV2: {
+    from: 14, weight: 1, hp: 60, speed: 38, wanderSpeed: 30, size: 18, points: 55, sides: 4,
+    damage: 28, fireDelay: 3.8, bulletSpeed: 440, bullets: 1, gap: 0, burst: 1, prefDist: 390,
+    homingTurnRate: 1.25,
+    color: '#297a3d', dark: '#06180a', line: '#00d435', info: 'GREEN V2 - fires long-range homing shots',
   },
 };
 
@@ -129,6 +139,9 @@ const WAVE = {
   minSpawnInterval: 0.2,
   breakTime:     5,
   healShare:     0.3,
+  waveClearBonusBase: 20,
+  waveClearBonusPerWave: 3,
+  waveClearBonusCap: 80,
   hpGrowth:      0.15,
   speedGrowth:   0.035,
   speedCap:      1.5,

@@ -33,10 +33,6 @@ function homingStrength() {
   return PER_CARD.homing * cardPower('homing');
 }
 
-function stunDuration() {
-  return PER_CARD.stun * cardPower('stun');
-}
-
 function bounceCount() { return cardPower('bounce'); }
 function pierceCount() { return cardPower('pierce'); }
 
@@ -181,8 +177,6 @@ function stepPlayerBullet(b, dt) {
     if (criticalHit) spawnBurst(e.x, e.y, '#ffe77a', 4, 180, 0.35);
     else spawnBurst(e.x, e.y, '#c02020', 3, 160, 0.3);
 
-    if (stunDuration() > 0) e.slowTimer = Math.max(e.slowTimer, stunDuration());
-
     if (b.piercesLeft > 0) { b.piercesLeft--; b.hit.add(e); }
     else                   { b.dead = true; return; }
   }
@@ -223,6 +217,17 @@ function explode(x, y, radius, bulletDmg) {
 }
 
 function stepEnemyBullet(b, dt) {
+  if (b.homingTurnRate > 0) {
+    const desiredAngle = Math.atan2(player.y - b.y, player.x - b.x);
+    const currentAngle = Math.atan2(b.vy, b.vx);
+    const turnStep = normalizeAngle(desiredAngle - currentAngle);
+    const maxTurn = b.homingTurnRate * dt;
+    const nextAngle = currentAngle + Math.max(-maxTurn, Math.min(maxTurn, turnStep));
+    const speed = Math.hypot(b.vx, b.vy);
+    b.vx = Math.cos(nextAngle) * speed;
+    b.vy = Math.sin(nextAngle) * speed;
+  }
+
   b.x += b.vx * dt;
   b.y += b.vy * dt;
 

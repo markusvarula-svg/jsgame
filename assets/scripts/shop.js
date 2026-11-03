@@ -11,7 +11,7 @@ const SHOP_UPGRADES = [
   },
   {
     id: 'damage', name: 'WEAPON DAMAGE', maxLevel: 10, baseCost: 80, costStep: 80,
-    description: 'Increase the damage of every bullet, including critical hits and explosions.',
+    description: 'Increase the damage of every bullet.',
     effect: level => '+' + Math.round(META_BONUS.damage * level * 100) + '% bullet damage',
   },
   {
@@ -21,7 +21,7 @@ const SHOP_UPGRADES = [
   },
   {
     id: 'armor', name: 'ARMOR', maxLevel: 8, baseCost: 100, costStep: 100,
-    description: 'Reduce damage from enemy attacks and contact.',
+    description: 'Reduce damage from enemy attacks.',
     effect: level => Math.round(META_BONUS.damageReduction * level * 100) + '% damage reduction',
   },
 ];

@@ -23,7 +23,10 @@ function startWave() {
 }
 
 function waveCleared() {
-  const bonus = 20 + wave * 5;
+  const bonus = Math.min(
+    WAVE.waveClearBonusCap,
+    WAVE.waveClearBonusBase + wave * WAVE.waveClearBonusPerWave
+  );
   sfx('clear');
   addPoints(bonus);
   player.hp = Math.min(player.maxHp, player.hp + player.maxHp * WAVE.healShare);
@@ -141,6 +144,7 @@ function enemyFire(e) {
       vy: Math.sin(angle) * cfg.bulletSpeed,
       damage: e.damage,
       blastRadius: e.blastRadius,
+      homingTurnRate: cfg.homingTurnRate || 0,
       life: 2.5,
     });
   }

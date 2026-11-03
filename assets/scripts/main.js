@@ -10,7 +10,7 @@ function init() {
 
   window.addEventListener('keydown', e => {
     const k = e.key.toLowerCase();
-    if (typeof isCheatShortcut === 'function' && isCheatShortcut(e) && !e.repeat) {
+    if (typeof toggleCheatPanel === 'function' && isCheatShortcut(e) && !e.repeat) {
       e.preventDefault();
       toggleCheatPanel();
       return;

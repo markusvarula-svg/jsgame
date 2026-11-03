@@ -67,9 +67,6 @@ canvas {
 #enemy-text { font-size: 13px; letter-spacing: 2px; padding-left: 2px; color: #e0a040; margin-top: 4px; }
 #score-text { font-size: 12px; letter-spacing: 2px; padding-left: 2px; color: #9aa0b8; margin-top: 4px; }
 
-#weapon-info { text-align: right; }
-#weapon-name { font-size: 18px; letter-spacing: 4px; color: #e8d070; }
-
 #banner {
   position: fixed;
   top: 110px;
@@ -291,6 +288,14 @@ canvas {
 .cheat-box h1 { font-size: 30px; letter-spacing: 6px; margin-bottom: 20px; }
 .cheat-actions { display: flex; flex-direction: column; gap: 10px; }
 .cheat-actions .btn { width: 100%; margin: 0; padding: 12px; font-size: 12px; }
+.cheat-wave-row { display: flex; align-items: center; gap: 8px; }
+.cheat-wave-row label { flex: 0 0 auto; color: #9aa0b8; font-size: 10px; letter-spacing: 1px; }
+.cheat-wave-row select { min-width: 0; flex: 1; padding: 10px; background: #171926; border: 1px solid #4a4f6a; color: #dde1ee; font: inherit; }
+.cheat-wave-row .btn { width: auto; }
+.cheat-scrap-row { display: flex; align-items: center; gap: 8px; }
+.cheat-scrap-row label { flex: 0 0 auto; color: #9aa0b8; font-size: 10px; letter-spacing: 1px; }
+.cheat-scrap-row select { min-width: 0; flex: 1; padding: 10px; background: #171926; border: 1px solid #4a4f6a; color: #dde1ee; font: inherit; }
+.cheat-scrap-row .btn { width: auto; }
 .cheat-card-row { display: flex; gap: 8px; }
 .cheat-card-row select { min-width: 0; flex: 1; padding: 10px; background: #171926; border: 1px solid #4a4f6a; color: #dde1ee; font: inherit; }
 .cheat-card-row .btn { width: auto; }

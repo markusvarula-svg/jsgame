@@ -19,9 +19,9 @@ const CARDS = [
     desc: 'Bullets deal ' + PER_CARD.damage * 100 + '% more damage.' },
   { id: 'damage-reduction', name: 'DAMAGE REDUCTION',
     desc: 'Incoming damage is reduced by ' + PER_CARD.damageReduction * 100 + '%.' },
-  { id: 'rate', name: 'FIRE RATE',
+  { id: 'rate', name: 'FIRE RATE BOOST',
     desc: 'You shoot ' + PER_CARD.rate * 100 + '% faster.' },
-  { id: 'health', name: 'TOUGH HIDE',
+  { id: 'health', name: 'TOUGH SKIN',
     desc: 'Max health +' + PER_CARD.health + ' and heal ' + PER_CARD.health + '.',
     onPick: b => { const h = Math.round(PER_CARD.health * b); player.maxHp += h; player.hp += h; } },
   { id: 'move', name: 'SWIFT FEET',
@@ -32,10 +32,8 @@ const CARDS = [
     desc: 'Bullets curve toward nearby enemies and track them more reliably.' },
   { id: 'siphon', name: 'LIFE SIPHON',
     desc: 'Killing enemies restores ' + PER_CARD.siphon + ' health.' },
-  { id: 'stun', name: 'STUN SHOT',
-    desc: 'Hits briefly slow enemies, making them easier to kite and punish.' },
   { id: 'time-stop', name: 'TIME STOP', rarity: 'legendary',
-    desc: 'Builds a chrono bar. When full, press Space to freeze time for a short window and shatter the screen in blue glass.',
+    desc: 'Builds a chrono bar. When full, press Space to freeze time for a short period.',
     onPick: () => { timeStopCharge = 0; } },
 ];
 
